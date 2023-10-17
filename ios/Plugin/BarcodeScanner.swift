@@ -144,18 +144,6 @@ typealias MLKitBarcodeScanner = MLKitBarcodeScanning.BarcodeScanner
         }
     }
 
-    @objc public func setZoom(zoomRatio) {
-        guard let device = AVCaptureDevice.default(for: AVMediaType.video) else { return }
-        guard device.hasTorch else { return }
-        do {
-            try device.lockForConfiguration()
-            device.torchMode = AVCaptureDevice.TorchMode.off
-            device.unlockForConfiguration()
-        } catch {
-            CAPLog.print("lockForConfiguration failed.", error.localizedDescription)
-        }
-    }
-
     @objc public func toggleTorch() {
         if self.isTorchEnabled() {
             self.disableTorch()
