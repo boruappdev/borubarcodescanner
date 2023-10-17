@@ -134,9 +134,8 @@ public class BarcodeScannerPlugin: CAPPlugin {
     }
 
     @objc func setZoom(_ call: CAPPluginCall) {
-        Float zoomRatio = call.getFloat("zoomRatio");
-
-        implementation?.setZoom(zoomRatio)
+        let zoomRatioCGFloat = CGFloat(call.getFloat("zoomRatio") ?? 1.0)
+        implementation?.setZoom(zoomRatioCGFloat)
         call.resolve()
     }
 

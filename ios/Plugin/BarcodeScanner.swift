@@ -116,13 +116,13 @@ typealias MLKitBarcodeScanner = MLKitBarcodeScanning.BarcodeScanner
         }
     }
 
-     @objc public func setZoom(zoomRatio) {
+     @objc public func setZoom(_ zoomRatio: CGFloat) {
         guard let device = AVCaptureDevice.default(for: AVMediaType.video) else { return }
 
         do {
             try device.lockForConfiguration()
             do {
-                try device.ramp(zoomRatio,0.5)
+                try device.videoZoomFactor = zoomRatio;
             } catch {
                 CAPLog.print("setZoom failed.", error.localizedDescription)
             }
