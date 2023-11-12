@@ -38,7 +38,11 @@ public protocol BarcodeScannerViewDelegate {
         captureSession.beginConfiguration()
         captureSession.sessionPreset = AVCaptureSession.Preset.hd1280x720
 
-        let captureDevice = AVCaptureDevice.default(.builtInUltraWideCamera, for: AVMediaType.video, position: settings.lensFacing)
+        // iPhone15,3 - iPhone 14 Pro Max
+        // iPhone16,2 - iPhone 15 Pro Max
+        let captureDevice = UIDevice.current.modelName == "iPhone15,3" || UIDevice.current.modelName == "iPhone16,2" ?
+            AVCaptureDevice.default(.builtInUltraWideCamera, for: AVMediaType.video, position: settings.lensFacing) :
+            AVCaptureDevice.default(.builtInWideAngleCamera, for: AVMediaType.video, position: settings.lensFacing)
         guard let captureDevice = captureDevice else {
             throw RuntimeError(implementation.plugin.errorNoCaptureDeviceAvailable)
         }
@@ -297,5 +301,19 @@ public protocol BarcodeScannerViewDelegate {
 
     @objc private func onTorchToggle() {
         self.delegate?.onTorchToggle()
+    }
+}
+
+// Define UIDevice.current.modelName
+extension UIDevice {
+    var modelName: String {
+        var systemInfo = utsname()
+        uname(&systemInfo)
+        let machineMirror = Mirror(reflecting: systemInfo.machine)
+        let identifier = machineMirror.children.reduce("") { identifier, element in
+            guard let value = element.value as? Int8, value != 0 else {return identifier }
+            return identifier + String(UnicodeScalar(UInt8(value)))
+        }
+        return identifier
     }
 }
