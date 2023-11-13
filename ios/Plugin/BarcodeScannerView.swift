@@ -38,11 +38,25 @@ public protocol BarcodeScannerViewDelegate {
         captureSession.beginConfiguration()
         captureSession.sessionPreset = AVCaptureSession.Preset.hd1280x720
 
+        // Slobodan's code - 11/13/2023
         // iPhone15,3 - iPhone 14 Pro Max
         // iPhone16,2 - iPhone 15 Pro Max
-        let captureDevice = UIDevice.current.modelName == "iPhone15,3" || UIDevice.current.modelName == "iPhone16,2" ?
-            AVCaptureDevice.default(.builtInUltraWideCamera, for: AVMediaType.video, position: settings.lensFacing) :
-            AVCaptureDevice.default(.builtInWideAngleCamera, for: AVMediaType.video, position: settings.lensFacing)
+        // let captureDevice = UIDevice.current.modelName == "iPhone15,3" || UIDevice.current.modelName == "iPhone16,2" ?
+        //     AVCaptureDevice.default(.builtInUltraWideCamera, for: AVMediaType.video, position: settings.lensFacing) :
+        //     AVCaptureDevice.default(.builtInWideAngleCamera, for: AVMediaType.video, position: settings.lensFacing)
+
+        // Vaibhav's Suggestion
+        let deviceTypes: [AVCaptureDevice.DeviceType]
+        deviceTypes = [.builtInUltraWideCamera, .builtInWideAngleCamera]
+        
+        let session = AVCaptureDevice.DiscoverySession(
+            deviceTypes: deviceTypes,
+            mediaType: .video,
+            position: .back
+        )
+
+        let captureDevice = session.devices.first
+        
         guard let captureDevice = captureDevice else {
             throw RuntimeError(implementation.plugin.errorNoCaptureDeviceAvailable)
         }
