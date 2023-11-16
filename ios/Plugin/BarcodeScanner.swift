@@ -101,7 +101,15 @@ typealias MLKitBarcodeScanner = MLKitBarcodeScanning.BarcodeScanner
     }
 
     @objc public func enableTorch() {
-        guard let device = AVCaptureDevice.default(for: AVMediaType.video) else { return }
+//        guard let device = AVCaptureDevice.default(for: AVMediaType.video) else { return }
+        
+        let session = AVCaptureDevice.DiscoverySession(
+            deviceTypes: [.builtInUltraWideCamera, .builtInWideAngleCamera],
+            mediaType: .video,
+            position: .back
+        )
+        guard let device = session.devices.first else { return }
+        
         guard device.hasTorch else { return }
         do {
             try device.lockForConfiguration()
@@ -111,13 +119,34 @@ typealias MLKitBarcodeScanner = MLKitBarcodeScanning.BarcodeScanner
                 CAPLog.print("setTorchModeOn failed.", error.localizedDescription)
             }
             device.unlockForConfiguration()
+            
+//            try device.lockForConfiguration()
+//            let on = device.isTorchActive
+//            if on != true && device.isTorchModeSupported(.on) {
+//                try device.setTorchModeOn(level: 1.0)
+//            } else if device.isTorchModeSupported(.off) {
+//                device.torchMode = .off
+//            } else {
+//                print("Torch mode is not supported")
+//            }
+//            device.unlockForConfiguration()
+            
+            
         } catch {
             CAPLog.print("lockForConfiguration failed.", error.localizedDescription)
         }
     }
 
      @objc public func setZoom(_ zoomRatio: CGFloat) {
-        guard let device = AVCaptureDevice.default(for: AVMediaType.video) else { return }
+//        guard let device = AVCaptureDevice.default(for: AVMediaType.video) else { return }
+         
+         let session = AVCaptureDevice.DiscoverySession(
+             deviceTypes: [.builtInUltraWideCamera, .builtInWideAngleCamera],
+             mediaType: .video,
+             position: .back
+         )
+         guard let device = session.devices.first else { return }
+        
 
         do {
             try device.lockForConfiguration()
@@ -133,7 +162,13 @@ typealias MLKitBarcodeScanner = MLKitBarcodeScanning.BarcodeScanner
     }
 
     @objc public func disableTorch() {
-        guard let device = AVCaptureDevice.default(for: AVMediaType.video) else { return }
+//        guard let device = AVCaptureDevice.default(for: AVMediaType.video) else { return }
+        let session = AVCaptureDevice.DiscoverySession(
+            deviceTypes: [.builtInUltraWideCamera, .builtInWideAngleCamera],
+            mediaType: .video,
+            position: .back
+        )
+        guard let device = session.devices.first else { return }
         guard device.hasTorch else { return }
         do {
             try device.lockForConfiguration()
@@ -153,15 +188,27 @@ typealias MLKitBarcodeScanner = MLKitBarcodeScanning.BarcodeScanner
     }
 
     @objc public func isTorchEnabled() -> Bool {
-        guard let device = AVCaptureDevice.default(for: AVMediaType.video) else { return false }
+//        guard let device = AVCaptureDevice.default(for: AVMediaType.video) else { return false }
+        let session = AVCaptureDevice.DiscoverySession(
+            deviceTypes: [.builtInUltraWideCamera, .builtInWideAngleCamera],
+            mediaType: .video,
+            position: .back
+        )
+        guard let device = session.devices.first else { return false }
         guard device.hasTorch else { return false }
         return device.torchMode == AVCaptureDevice.TorchMode.on
     }
 
     @objc public func isTorchAvailable() -> Bool {
-        guard let device = AVCaptureDevice.default(for: AVMediaType.video) else {
-            return false
-        }
+//        guard let device = AVCaptureDevice.default(for: AVMediaType.video) else {
+//            return false
+//        }
+        let session = AVCaptureDevice.DiscoverySession(
+            deviceTypes: [.builtInUltraWideCamera, .builtInWideAngleCamera],
+            mediaType: .video,
+            position: .back
+        )
+        guard let device = session.devices.first else { return false }
         return device.hasTorch
     }
 
