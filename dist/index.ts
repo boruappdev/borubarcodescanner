@@ -6,6 +6,5 @@ const BarcodeScanner = registerPlugin<BarcodeScannerPlugin>('BarcodeScanner', {
   web: () => import('./web').then(m => new m.BarcodeScannerWeb()),
 });
 
-
 export * from './definitions';
 export { BarcodeScanner };
