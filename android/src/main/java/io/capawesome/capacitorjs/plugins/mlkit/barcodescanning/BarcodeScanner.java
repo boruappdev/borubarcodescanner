@@ -71,6 +71,7 @@ public class BarcodeScanner implements ImageAnalysis.Analyzer {
     private ModuleInstallProgressListener moduleInstallProgressListener;
 
     private boolean isTorchEnabled = false;
+    private int barcodeScanCounter = 0;
 
     private HashMap<String, Integer> barcodeRawValueVotes = new HashMap<String, Integer>();
 
@@ -138,6 +139,7 @@ public class BarcodeScanner implements ImageAnalysis.Analyzer {
         barcodeScannerInstance = null;
         scanSettings = null;
         barcodeRawValueVotes.clear();
+        barcodeScanCounter = 0;
     }
 
     public void readBarcodesFromImage(String path, ScanSettings scanSettings, ReadBarcodesFromImageResultCallback callback)
@@ -344,18 +346,27 @@ public class BarcodeScanner implements ImageAnalysis.Analyzer {
         barcodeScannerInstance
             .process(inputImage)
             .addOnSuccessListener(
-                barcodes -> {
-                    if (scanSettings == null) {
-                        // Scanning stopped while processing the image
-                        return;
-                    }
-                    for (Barcode barcode : barcodes) {
-                        Integer votes = voteForBarcode(barcode);
-                        if (votes >= 5) {
-                          handleScannedBarcode(barcode, imageSize);
-                        }
-                    }
+              barcodes -> {
+                if (scanSettings == null) {
+                  // Scanning stopped while processing the image
+                  return;
                 }
+                for (Barcode barcode : barcodes) {
+                  barcodeScanCounter = barcodeScanCounter + 1;
+
+                  Integer votes = voteForBarcode(barcode);
+                  if (votes >= 6) {
+                    handleScannedBarcode(barcode, imageSize);
+                    stopScan();
+                    break;
+                  }
+
+                  if (barcodeScanCounter > 11) {
+                    handleScanError(new Exception("BarcodeVotesExceeds"));
+                    stopScan();
+                  }
+                }
+              }
             )
             .addOnFailureListener(
                 exception -> {

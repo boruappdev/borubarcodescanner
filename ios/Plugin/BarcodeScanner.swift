@@ -17,6 +17,7 @@ typealias MLKitBarcodeScanner = MLKitBarcodeScanning.BarcodeScanner
     private var scanCompletionHandler: (([Barcode]?, AVCaptureVideoOrientation?, String?) -> Void)?
 
     private var barcodeRawValueVotes = [String: Int]()
+    private var barcodeScanCounter = 0
 
     init(plugin: BarcodeScannerPlugin) {
         self.plugin = plugin
@@ -53,6 +54,7 @@ typealias MLKitBarcodeScanner = MLKitBarcodeScanning.BarcodeScanner
         }
         self.scanCompletionHandler = nil
         self.barcodeRawValueVotes.removeAll()
+        barcodeScanCounter = 0
     }
 
     @objc public func readBarcodesFromImage(imageUrl: URL, settings: ScanSettings, completion: @escaping ([Barcode]?, String?) -> Void) {
@@ -307,9 +309,19 @@ extension BarcodeScanner: BarcodeScannerViewDelegate {
             self.stopScan()
         } else {
             for barcode in barcodes {
+                barcodeScanCounter += 1
+
                 let votes = self.voteForBarcode(barcode: barcode)
-                if votes >= 5 {
+                if votes >= 6 {
                     self.handleScannedBarcode(barcode: barcode, imageSize: imageSize, videoOrientation: videoOrientation)
+                    self.stopScan()
+                    break
+                }
+
+                if barcodeScanCounter > 11 {
+                    completion(nil, "barcodeVotesExceeds")
+                    self.stopScan()
+                    break
                 }
             }
         }
