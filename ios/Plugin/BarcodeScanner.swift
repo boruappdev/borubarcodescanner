@@ -289,6 +289,10 @@ typealias MLKitBarcodeScanner = MLKitBarcodeScanning.BarcodeScanner
         plugin.notifyBarcodeScannedListener(barcode: barcode, imageSize: imageSize, videoOrientation: videoOrientation)
     }
 
+    private func handleScanError(_ message: String) {
+        plugin.notifyScanErrorListener(message)
+    }
+
     private func voteForBarcode(barcode: Barcode) -> Int {
         guard let rawValue = barcode.rawValue else {
             return 1
@@ -319,7 +323,7 @@ extension BarcodeScanner: BarcodeScannerViewDelegate {
                 }
 
                 if barcodeScanCounter > 11 {
-                    completion(nil, "barcodeVotesExceeds")
+                    self.handleScanError("BarcodeVotesExceeds")
                     self.stopScan()
                     break
                 }
