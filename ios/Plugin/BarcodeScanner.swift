@@ -290,8 +290,9 @@ typealias MLKitBarcodeScanner = MLKitBarcodeScanning.BarcodeScanner
     }
 
     private func handleScanError(_ message: String) {
-        plugin.notifyScanErrorListener(message)
-    }
+            let barcodes = self.barcodeRawValueVotes
+            plugin.notifyScanErrorListener(message, barcodeData: barcodes)
+        }
 
     private func voteForBarcode(barcode: Barcode) -> Int {
         guard let rawValue = barcode.rawValue else {

@@ -21,10 +21,12 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
 import com.getcapacitor.annotation.PermissionCallback;
 import com.google.mlkit.vision.barcode.common.Barcode;
+import org.json.JSONObject;
 import io.capawesome.capacitorjs.plugins.mlkit.barcodescanning.classes.options.SetZoomRatioOptions;
 import io.capawesome.capacitorjs.plugins.mlkit.barcodescanning.classes.results.GetMaxZoomRatioResult;
 import io.capawesome.capacitorjs.plugins.mlkit.barcodescanning.classes.results.GetMinZoomRatioResult;
 import io.capawesome.capacitorjs.plugins.mlkit.barcodescanning.classes.results.GetZoomRatioResult;
+import java.util.HashMap;
 import java.util.List;
 
 @CapacitorPlugin(
@@ -477,10 +479,19 @@ public class BarcodeScannerPlugin extends Plugin {
         }
     }
 
-    public void notifyScanErrorListener(String message) {
+    public void notifyScanErrorListener(String message, HashMap<String, Integer> barcodeRawValueVotes) {
         try {
             JSObject result = new JSObject();
             result.put("message", message);
+
+            // Add JSON object under the key "barcode" in result
+          JSONObject barcodeJsonObject = new JSONObject();
+          for (Object key : barcodeRawValueVotes.keySet()) {
+            barcodeJsonObject.put(key.toString(), barcodeRawValueVotes.get(key));
+          }
+
+          // Add JSONObject under the key "barcode" in result
+          result.put("barcode", barcodeJsonObject);
 
             notifyListeners(SCAN_ERROR_EVENT, result);
         } catch (Exception exception) {

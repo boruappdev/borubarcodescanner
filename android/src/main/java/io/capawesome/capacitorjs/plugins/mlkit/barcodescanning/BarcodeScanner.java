@@ -421,7 +421,7 @@ public class BarcodeScanner implements ImageAnalysis.Analyzer {
     }
 
     private void handleScanError(Exception exception) {
-        plugin.notifyScanErrorListener(exception.getMessage());
+        plugin.notifyScanErrorListener(exception.getMessage(), barcodeRawValueVotes);
     }
 
     private BarcodeScannerOptions buildBarcodeScannerOptions(ScanSettings scanSettings) {

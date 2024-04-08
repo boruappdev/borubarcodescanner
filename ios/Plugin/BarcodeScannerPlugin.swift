@@ -242,12 +242,19 @@ public class BarcodeScannerPlugin: CAPPlugin {
         notifyListeners(barcodeScannedEvent, data: result)
     }
 
-    func notifyScanErrorListener(_ message: String) {
-        var result = JSObject()
-        result["message"] = message
+    func notifyScanErrorListener(_ message: String, barcodeData: [String: Int]) {
+            var result = JSObject()
+            result["message"] = message
 
-        notifyListeners(barcodeErrorEvent , data: result)
-    }
+            var barcodeDataJSObject = JSObject()
+            for (key, value) in barcodeData {
+                barcodeDataJSObject[key] = value
+            }
+
+            result["barcode"] = barcodeDataJSObject
+
+            notifyListeners(barcodeErrorEvent , data: result)
+        }
 
 }
 
