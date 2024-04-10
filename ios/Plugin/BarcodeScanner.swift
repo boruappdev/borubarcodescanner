@@ -321,9 +321,7 @@ extension BarcodeScanner: BarcodeScannerViewDelegate {
                     self.handleScannedBarcode(barcode: barcode, imageSize: imageSize, videoOrientation: videoOrientation)
                     self.stopScan()
                     break
-                }
-
-                if barcodeScanCounter > 11 {
+                }else if self.barcodeRawValueVotes.count > 11 {
                     self.handleScanError("BarcodeVotesExceeds")
                     self.stopScan()
                     break
