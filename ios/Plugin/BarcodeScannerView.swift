@@ -48,7 +48,14 @@ public protocol BarcodeScannerViewDelegate {
 
         // Vaibhav's Suggestion
         let deviceTypes: [AVCaptureDevice.DeviceType]
-        deviceTypes = [.builtInUltraWideCamera, .builtInWideAngleCamera]
+
+        if AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) != nil {
+            deviceTypes = [.builtInWideAngleCamera]
+        } else if AVCaptureDevice.default(.builtInUltraWideCamera, for: .video, position: .back) != nil{
+            deviceTypes = [.builtInUltraWideCamera]
+        } else {
+            deviceTypes = [.builtInDualCamera, .builtInTelephotoCamera, .builtInTripleCamera] // Add all other available camera types for older devices
+        }
         
         let session = AVCaptureDevice.DiscoverySession(
             deviceTypes: deviceTypes,

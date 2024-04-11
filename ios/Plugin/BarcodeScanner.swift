@@ -101,15 +101,32 @@ typealias MLKitBarcodeScanner = MLKitBarcodeScanning.BarcodeScanner
         return UIImagePickerController.isSourceTypeAvailable(.camera)
     }
 
-    @objc public func enableTorch() {
-//        guard let device = AVCaptureDevice.default(for: AVMediaType.video) else { return }
+    @objc public func getSupportedCameraDevice() -> AVCaptureDevice? {
+        let deviceTypes: [AVCaptureDevice.DeviceType]
+
+        if AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) != nil {
+            deviceTypes = [.builtInWideAngleCamera]
+        } else if AVCaptureDevice.default(.builtInUltraWideCamera, for: .video, position: .back) != nil{
+            deviceTypes = [.builtInUltraWideCamera]
+        } else {
+            deviceTypes = [.builtInDualCamera, .builtInTelephotoCamera, .builtInTripleCamera] // Add all other available camera types for older devices
+        }
         
         let session = AVCaptureDevice.DiscoverySession(
-            deviceTypes: [.builtInUltraWideCamera, .builtInWideAngleCamera],
+            deviceTypes: deviceTypes,
             mediaType: .video,
             position: .back
         )
-        guard let device = session.devices.first else { return }
+
+        let device = session.devices.first
+
+        return device
+    }
+
+    @objc public func enableTorch() {
+//        guard let device = AVCaptureDevice.default(for: AVMediaType.video) else { return }
+
+        guard let device = self.getSupportedCameraDevice() else { return }
         
         guard device.hasTorch else { return }
         do {
@@ -127,12 +144,8 @@ typealias MLKitBarcodeScanner = MLKitBarcodeScanning.BarcodeScanner
 
     @objc public func disableTorch() {
 //        guard let device = AVCaptureDevice.default(for: AVMediaType.video) else { return }
-        let session = AVCaptureDevice.DiscoverySession(
-            deviceTypes: [.builtInUltraWideCamera, .builtInWideAngleCamera],
-            mediaType: .video,
-            position: .back
-        )
-        guard let device = session.devices.first else { return }
+        guard let device = self.getSupportedCameraDevice() else { return }
+
         guard device.hasTorch else { return }
         do {
             try device.lockForConfiguration()
@@ -153,12 +166,8 @@ typealias MLKitBarcodeScanner = MLKitBarcodeScanning.BarcodeScanner
 
     @objc public func isTorchEnabled() -> Bool {
 //        guard let device = AVCaptureDevice.default(for: AVMediaType.video) else { return false }
-        let session = AVCaptureDevice.DiscoverySession(
-            deviceTypes: [.builtInUltraWideCamera, .builtInWideAngleCamera],
-            mediaType: .video,
-            position: .back
-        )
-        guard let device = session.devices.first else { return false }
+        guard let device = self.getSupportedCameraDevice() else { return false }
+
         guard device.hasTorch else { return false }
         return device.torchMode == AVCaptureDevice.TorchMode.on
     }
@@ -167,44 +176,37 @@ typealias MLKitBarcodeScanner = MLKitBarcodeScanning.BarcodeScanner
 //        guard let device = AVCaptureDevice.default(for: AVMediaType.video) else {
 //            return false
 //        }
-        let session = AVCaptureDevice.DiscoverySession(
-            deviceTypes: [.builtInUltraWideCamera, .builtInWideAngleCamera],
-            mediaType: .video,
-            position: .back
-        )
-        guard let device = session.devices.first else { return false }
+        guard let device = self.getSupportedCameraDevice() else { return false }
+
         return device.hasTorch
     }
 
     @objc public func setZoomRatio(_ options: SetZoomRatioOptions) throws {
         let zoomRatio = options.getZoomRatio()
+        guard let device = self.getSupportedCameraDevice() else { return }
 
-        guard let device = AVCaptureDevice.default(for: AVMediaType.video) else {
-            return
-        }
+        do {
         try device.lockForConfiguration()
+            defer { device.unlockForConfiguration() }
         device.videoZoomFactor = zoomRatio
-        device.unlockForConfiguration()
+        } catch {
+            debugPrint(error)
+        }
     }
 
     @objc public func getZoomRatio() -> GetZoomRatioResult? {
-        guard let device = AVCaptureDevice.default(for: AVMediaType.video) else {
-            return nil
-        }
+        guard let device = self.getSupportedCameraDevice() else { return nil }
+
         return GetZoomRatioResult(zoomRatio: device.videoZoomFactor)
     }
 
     @objc public func getMinZoomRatio() -> GetMinZoomRatioResult? {
-        guard let device = AVCaptureDevice.default(for: AVMediaType.video) else {
-            return nil
-        }
+        guard let device = self.getSupportedCameraDevice() else { return nil }
         return GetMinZoomRatioResult(zoomRatio: device.minAvailableVideoZoomFactor)
     }
 
     @objc public func getMaxZoomRatio() -> GetMaxZoomRatioResult? {
-        guard let device = AVCaptureDevice.default(for: AVMediaType.video) else {
-            return nil
-        }
+        guard let device = self.getSupportedCameraDevice() else { return nil }
         return GetMaxZoomRatioResult(zoomRatio: device.maxAvailableVideoZoomFactor)
     }
 
