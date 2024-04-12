@@ -85,11 +85,13 @@ public protocol BarcodeScannerViewDelegate {
         } else {
             throw RuntimeError(implementation.plugin.errorCannotAddCaptureOutput)
         }
-        captureSession.commitConfiguration()
+
 
         DispatchQueue.global(qos: .background).async {
             captureSession.startRunning()
         }
+        captureSession.commitConfiguration()
+
         self.captureSession = captureSession
         let formats = settings.formats.count == 0 ? BarcodeFormat.all : BarcodeFormat(settings.formats)
         self.barcodeScannerInstance = MLKitBarcodeScanner.barcodeScanner(options: BarcodeScannerOptions(formats: formats))
