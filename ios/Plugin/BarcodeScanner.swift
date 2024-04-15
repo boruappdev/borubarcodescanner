@@ -104,7 +104,17 @@ typealias MLKitBarcodeScanner = MLKitBarcodeScanning.BarcodeScanner
     @objc public func getSupportedCameraDevice() -> AVCaptureDevice? {
         let deviceTypes: [AVCaptureDevice.DeviceType]
 
-        if AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) != nil {
+        var size = 0
+        sysctlbyname("hw.machine", nil, &size, nil, 0)
+        var machine = [CChar](repeating: 0, count: size)
+        sysctlbyname("hw.machine", &machine, &size, nil, 0)
+        let modelName = String(cString: machine)
+
+        let supportedModels = ["iPhone14,2", "iPhone14,3", "iPhone15,2", "iPhone15,3", "iPhone16,1", "iPhone16,2"]
+
+        if supportedModels.contains(modelName) {
+            deviceTypes = [.builtInUltraWideCamera]
+        }else if AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) != nil {
             deviceTypes = [.builtInWideAngleCamera]
         } else if AVCaptureDevice.default(.builtInUltraWideCamera, for: .video, position: .back) != nil{
             deviceTypes = [.builtInUltraWideCamera]
@@ -185,12 +195,24 @@ typealias MLKitBarcodeScanner = MLKitBarcodeScanning.BarcodeScanner
         let zoomRatio = options.getZoomRatio()
         guard let device = self.getSupportedCameraDevice() else { return }
 
-        do {
-        try device.lockForConfiguration()
-            defer { device.unlockForConfiguration() }
-        device.videoZoomFactor = zoomRatio
-        } catch {
-            debugPrint(error)
+        var size = 0
+        sysctlbyname("hw.machine", nil, &size, nil, 0)
+        var machine = [CChar](repeating: 0, count: size)
+        sysctlbyname("hw.machine", &machine, &size, nil, 0)
+        let modelName = String(cString: machine)
+
+        let supportedModels = ["iPhone14,2", "iPhone14,3", "iPhone15,2", "iPhone15,3", "iPhone16,1", "iPhone16,2"]
+
+        if supportedModels.contains(modelName) {
+            // Do not zoom for 3 camera set devices
+        }else{
+            do {
+            try device.lockForConfiguration()
+                defer { device.unlockForConfiguration() }
+            device.videoZoomFactor = zoomRatio
+            } catch {
+                debugPrint(error)
+            }
         }
     }
 
