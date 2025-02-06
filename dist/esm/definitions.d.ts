@@ -209,6 +209,13 @@ export interface BarcodeScannerPlugin {
      * @since 0.0.1
      */
     removeAllListeners(): Promise<void>;
+
+    /**
+     * Set Scan Success and Failure Limits.
+     *
+     * @since 0.0.1
+     */
+    setScanLimits(options: SetScanLimitOptions): Promise<void>;
 }
 /**
  * @since 0.0.1
@@ -279,6 +286,12 @@ export interface ScanResult {
      * @since 0.0.1
      */
     barcodes: Barcode[];
+}
+
+export interface SetScanLimitOptions {
+
+    VoteScanSuccessLMT: number;
+    VoteScanFailureLMT: number;
 }
 /**
  * @since 0.0.1
