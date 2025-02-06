@@ -22,6 +22,8 @@ import com.getcapacitor.annotation.Permission;
 import com.getcapacitor.annotation.PermissionCallback;
 import com.google.mlkit.vision.barcode.common.Barcode;
 import org.json.JSONObject;
+
+import io.capawesome.capacitorjs.plugins.mlkit.barcodescanning.classes.options.SetScanLimitOptions;
 import io.capawesome.capacitorjs.plugins.mlkit.barcodescanning.classes.options.SetZoomRatioOptions;
 import io.capawesome.capacitorjs.plugins.mlkit.barcodescanning.classes.results.GetMaxZoomRatioResult;
 import io.capawesome.capacitorjs.plugins.mlkit.barcodescanning.classes.results.GetMinZoomRatioResult;
@@ -278,6 +280,32 @@ public class BarcodeScannerPlugin extends Plugin {
             call.reject(exception.getMessage());
         }
     }
+    @PluginMethod
+    public void setScanLimits(PluginCall call) {
+        try {
+          Logger.debug("-----------------------------------setScanLimits-------------------------------------");
+          Integer VoteScanFailureLMT_Obj = call.getInt("VoteScanFailureLMT");
+          int VoteScanFailureLMT = (VoteScanFailureLMT_Obj != null) ? VoteScanFailureLMT_Obj : -1;
+          if (VoteScanFailureLMT == -1) {
+            call.reject(ERROR_ZOOM_RATIO_MISSING);
+            return;
+          }
+
+          Integer VoteScanSuccessLMT_Obj = call.getInt("VoteScanSuccessLMT");
+          int VoteScanSuccessLMT = (VoteScanSuccessLMT_Obj != null) ? VoteScanSuccessLMT_Obj : -1;
+          if (VoteScanSuccessLMT == -1) {
+            call.reject(ERROR_ZOOM_RATIO_MISSING);
+            return;
+          }
+
+          SetScanLimitOptions options = new SetScanLimitOptions(VoteScanSuccessLMT, VoteScanFailureLMT);
+          implementation.setScanLimits(options);
+          call.resolve();
+        } catch (Exception exception) {
+            Logger.error(TAG, exception.getMessage(), exception);
+            call.reject(exception.getMessage());
+        }
+    }
 
     @PluginMethod
     public void isTorchEnabled(PluginCall call) {
@@ -466,13 +494,24 @@ public class BarcodeScannerPlugin extends Plugin {
         }
     }
 
-    public void notifyBarcodeScannedListener(Barcode barcode, Point imageSize) {
+    public void notifyBarcodeScannedListener(Barcode barcode, Point imageSize, HashMap<String, Integer> barcodeRawValueVotes) {
         try {
             Point screenSize = this.getScreenSize();
             JSObject barcodeResult = BarcodeScannerHelper.createBarcodeResultForBarcode(barcode, imageSize, screenSize);
 
             JSObject result = new JSObject();
-            result.put("barcode", barcodeResult);
+
+          JSONObject barcodeJsonObject = new JSONObject();
+          for (Object key : barcodeRawValueVotes.keySet()) {
+            barcodeJsonObject.put(key.toString(), barcodeRawValueVotes.get(key));
+          }
+          // Add JSONObject under the key "barcode" in result
+
+          JSObject mergedBarcode = new JSObject();
+          mergedBarcode.put("barcodeResult", barcodeResult);
+          mergedBarcode.put("barcodeVotes", barcodeJsonObject);
+          result.put("barcode", mergedBarcode);
+
             notifyListeners(BARCODE_SCANNED_EVENT, result);
         } catch (Exception exception) {
             Logger.error(TAG, exception.getMessage(), exception);
