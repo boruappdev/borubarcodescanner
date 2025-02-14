@@ -11,6 +11,8 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.media.Image;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.view.Display;
 import android.view.WindowManager;
@@ -43,6 +45,7 @@ import com.google.mlkit.vision.common.InputImage;
 
 import io.capawesome.capacitorjs.plugins.mlkit.barcodescanning.classes.options.SetScanLimitOptions;
 import io.capawesome.capacitorjs.plugins.mlkit.barcodescanning.classes.options.SetZoomRatioOptions;
+import io.capawesome.capacitorjs.plugins.mlkit.barcodescanning.classes.options.SetscanDelayMillisOptions;
 import io.capawesome.capacitorjs.plugins.mlkit.barcodescanning.classes.results.GetMaxZoomRatioResult;
 import io.capawesome.capacitorjs.plugins.mlkit.barcodescanning.classes.results.GetMinZoomRatioResult;
 import io.capawesome.capacitorjs.plugins.mlkit.barcodescanning.classes.results.GetZoomRatioResult;
@@ -76,8 +79,11 @@ public class BarcodeScanner implements ImageAnalysis.Analyzer {
     private int VoteScanSuccessLMT = 0;
     private int VoteScanFailureLMT = 0;
     private int barcodeScanCounter = 0;
+    private int scanDelayMillis = 0;
 
     private HashMap<String, Integer> barcodeRawValueVotes = new HashMap<String, Integer>();
+
+    private final Handler handler = new Handler(Looper.getMainLooper());
 
     public BarcodeScanner(BarcodeScannerPlugin plugin) {
         this.plugin = plugin;
@@ -344,6 +350,7 @@ public class BarcodeScanner implements ImageAnalysis.Analyzer {
         Image image = imageProxy.getImage();
 
         if (image == null || barcodeScannerInstance == null) {
+            imageProxy.close();
             return;
         }
 
@@ -381,8 +388,10 @@ public class BarcodeScanner implements ImageAnalysis.Analyzer {
             )
             .addOnCompleteListener(
                 task -> {
+                    handler.postDelayed(() -> {
                     imageProxy.close();
                     image.close();
+                    }, scanDelayMillis);
                 }
             );
     }
@@ -459,4 +468,8 @@ public class BarcodeScanner implements ImageAnalysis.Analyzer {
     this.VoteScanFailureLMT = (int) options.getVoteScanFailureLMT();
     this.VoteScanSuccessLMT = (int) options.getVoteScanSuccessLMT();
   }
+
+    public void setScanDelay(SetscanDelayMillisOptions options) {
+    this.scanDelayMillis = (int) options.getscanDelayMillis();
+    }
 }

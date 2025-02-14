@@ -216,6 +216,12 @@ export interface BarcodeScannerPlugin {
      * @since 0.0.1
      */
     setScanLimits(options: SetScanLimitOptions): Promise<void>;
+
+    /**
+     * set scan delay
+     * @param options
+     */
+    setScanDelay(options: SetscanDelayMillisOptions): Promise<void>;
 }
 /**
  * @since 0.0.1
@@ -293,6 +299,16 @@ export interface SetScanLimitOptions {
     VoteScanSuccessLMT: number;
     VoteScanFailureLMT: number;
 }
+
+/**
+ * The scan delay set
+ * @since 5.4.0
+ */
+export interface SetscanDelayMillisOptions {
+
+    scanDelayMillis: number;
+}
+
 /**
  * @since 0.0.1
  */

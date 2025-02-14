@@ -24,6 +24,7 @@ import com.google.mlkit.vision.barcode.common.Barcode;
 import org.json.JSONObject;
 
 import io.capawesome.capacitorjs.plugins.mlkit.barcodescanning.classes.options.SetScanLimitOptions;
+import io.capawesome.capacitorjs.plugins.mlkit.barcodescanning.classes.options.SetscanDelayMillisOptions;
 import io.capawesome.capacitorjs.plugins.mlkit.barcodescanning.classes.options.SetZoomRatioOptions;
 import io.capawesome.capacitorjs.plugins.mlkit.barcodescanning.classes.results.GetMaxZoomRatioResult;
 import io.capawesome.capacitorjs.plugins.mlkit.barcodescanning.classes.results.GetMinZoomRatioResult;
@@ -49,6 +50,7 @@ public class BarcodeScannerPlugin extends Plugin {
     public static final String ERROR_PATH_MISSING = "path must be provided.";
     public static final String ERROR_LOAD_IMAGE_FAILED = "The image could not be loaded.";
     public static final String ERROR_ZOOM_RATIO_MISSING = "zoomRatio must be provided.";
+  public static final String ERROR_SCAN_DELAY_MISSING = "Provide scan delay.";
     public static final String ERROR_NO_ACTIVE_SCAN_SESSION = "There is no active scan session.";
     public static final String ERROR_GOOGLE_BARCODE_SCANNER_MODULE_NOT_AVAILABLE =
         "The Google Barcode Scanner Module is not available. You must install it first.";
@@ -280,6 +282,24 @@ public class BarcodeScannerPlugin extends Plugin {
             call.reject(exception.getMessage());
         }
     }
+    @PluginMethod
+    public void setScanDelay(PluginCall call) {
+      try {
+      Integer scanDelayMillis_Obj = call.getInt("scanDelayMillis");
+      int scanDelayMillis = (scanDelayMillis_Obj != null) ? scanDelayMillis_Obj : -1;
+      if (scanDelayMillis == -1) {
+        call.reject(ERROR_SCAN_DELAY_MISSING);
+          return;
+        }
+        SetscanDelayMillisOptions options = new SetscanDelayMillisOptions(scanDelayMillis);
+        implementation.setScanDelay(options);
+        call.resolve();
+      } catch (Exception exception) {
+        Logger.error(TAG, exception.getMessage(), exception);
+        call.reject(exception.getMessage());
+      }
+    }
+
     @PluginMethod
     public void setScanLimits(PluginCall call) {
         try {
