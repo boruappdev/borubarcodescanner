@@ -53,7 +53,7 @@ public class BarcodeScannerPlugin extends Plugin {
   public static final String ERROR_SCAN_DELAY_MISSING = "Provide scan delay.";
     public static final String ERROR_NO_ACTIVE_SCAN_SESSION = "There is no active scan session.";
     public static final String ERROR_GOOGLE_BARCODE_SCANNER_MODULE_NOT_AVAILABLE =
-        "The Google Barcode Scanner Module is not available. You must install it first.";
+        "The Google Barcode Scanner Module is not available. You must install it first using the installGoogleBarcodeScannerModule method.";
     public static final String ERROR_GOOGLE_BARCODE_SCANNER_MODULE_ALREADY_INSTALLED =
         "The Google Barcode Scanner Module is already installed.";
     public static final String ERROR_PERMISSION_DENIED = "User denied access to camera.";
