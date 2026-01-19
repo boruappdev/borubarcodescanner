@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.media.Image;
 import android.net.Uri;
+import android.util.Size;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
@@ -104,7 +105,7 @@ public class BarcodeScanner implements ImageAnalysis.Analyzer {
         BarcodeScannerOptions options = buildBarcodeScannerOptions(scanSettings);
         barcodeScannerInstance = BarcodeScanning.getClient(options);
 
-        ImageAnalysis imageAnalysis = new ImageAnalysis.Builder().setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).build();
+        ImageAnalysis imageAnalysis = new ImageAnalysis.Builder().setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).setTargetResolution(new Size(1280, 720)).build();
         imageAnalysis.setAnalyzer(ContextCompat.getMainExecutor(plugin.getContext()), this);
 
         ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(plugin.getContext());
